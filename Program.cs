@@ -12,6 +12,7 @@ namespace PrimeVideoPaymentSimulator
             // Add services to the container.
             builder.Services.AddRazorPages();
 
+
             // Configuración de Entity Framework Core (Base de datos en memoria)
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseInMemoryDatabase("PaymentDb"));
