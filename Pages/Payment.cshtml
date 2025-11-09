@@ -1,0 +1,168 @@
+﻿@page
+@model PrimeVideoPaymentSimulator.Pages.PaymentModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "Añadir Tarjeta";
+    Layout = "_Layout";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="payment-container">
+            <div class="prime-header">
+                @* La ruta comienza con ~ para apuntar a la carpeta wwwroot *@
+                <img src="~/prime_logo.png" alt="Prime Video Logo" class="img-fluid prime-logo" />
+                <h4 class="mt-3">Agrega una tarjeta de crédito o débito</h4>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger" role="alert">
+                    @Model.ErrorMessage
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(Model.Message))
+            {
+                <div class="alert alert-success" role="alert">
+                    @Model.Message
+                </div>
+            }
+
+            <form method="post" id="paymentForm">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="input-group-label">
+                    <label>Ingresa la información de tu tarjeta:</label>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Card.CardHolderName"></label>
+                    <input asp-for="Card.CardHolderName" class="form-control" placeholder="Nombre del titular de la tarjeta" />
+                    <span asp-validation-for="Card.CardHolderName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Card.CardNumber"></label>
+                    <input asp-for="Card.CardNumber" class="form-control" placeholder="Número de tarjeta" id="CardNumberInput" />
+                    <span asp-validation-for="Card.CardNumber" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Fecha de vencimiento</label>
+                    <div class="select-group">
+
+                        @* CRÍTICO: El uso de SelectList para cargar los datos de ViewData *@
+                        <select asp-for="Card.ExpiryMonth" class="form-control"
+                                asp-items="@(new SelectList(ViewData["Months"] as System.Collections.IEnumerable, "Value", "Text"))">
+                            <option value="">Mes</option>
+                        </select>
+
+                        <select asp-for="Card.ExpiryYear" class="form-control"
+                                asp-items="@(new SelectList(ViewData["Years"] as System.Collections.IEnumerable, "Value", "Text"))">
+                            <option value="">Año</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="Card.ExpiryMonth" class="text-danger"></span>
+                    <span asp-validation-for="Card.ExpiryYear" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label asp-for="Card.Cvv"></label>
+                    <input asp-for="Card.Cvv" class="form-control" placeholder="Código de seguridad (CVV)" id="CvvInput" />
+                    <span asp-validation-for="Card.Cvv" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-amazon">Añade tu tarjeta</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* ESTILOS CSS INCRUSTADOS PARA EL LOOK AND FEEL DE PRIME VIDEO *@
+<style>
+    .payment-container {
+        padding: 30px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-top: 50px;
+        background-color: #fff;
+    }
+
+    .prime-header {
+        text-align: center;
+        margin-bottom: 25px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+    }
+
+    .prime-logo {
+        width: 200px !important; /* Fuerza el ancho para el diagnóstico */
+        height: auto;
+    }
+
+    .btn-amazon {
+        background-color: #00A8E1; /* Azul de Amazon/Prime */
+        border-color: #00A8E1;
+        color: #fff;
+        width: 100%;
+        padding: 10px;
+        font-size: 1.1rem;
+        transition: background-color 0.3s;
+    }
+
+        .btn-amazon:hover {
+            background-color: #008CB8;
+            border-color: #008CB8;
+        }
+
+    .select-group {
+        display: flex;
+        gap: 10px;
+    }
+
+        .select-group .form-control {
+            flex: 1;
+            display: inline-block;
+        }
+
+    .input-group-label label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+    }
+</style>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    @* Inclusión de JQuery para la validación avanzada *@
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Script para limitar la longitud del campo de tarjeta (16 dígitos)
+            $("#CardNumberInput").on('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '').substring(0, 16);
+            });
+            // Script para limitar la longitud del campo CVV (3 dígitos)
+            $("#CvvInput").on('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '').substring(0, 3);
+            });
+
+            // JQuery validation handler (ejecuta validación al hacer submit)
+            $("#paymentForm").submit(function() {
+                // Si la validación de ASP.NET Core ya falló, no necesitamos más JS
+                if (!$(this).valid()) {
+                    return true;
+                }
+
+                // Aquí podrías agregar lógica de validación JavaScript adicional si es necesario
+
+                return true;
+            });
+        });
+    </script>
+}

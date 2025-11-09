@@ -1,0 +1,45 @@
+# Creado para proyectos .NET Core / ASP.NET Core
+
+## Carpeta de Build/Salida
+# Ignorar las carpetas generadas por la compilación (bin y obj)
+[Bb]in/
+[Oo]bj/
+
+## Archivos de Usuario y Visual Studio
+# Archivos de usuario específicos de Visual Studio
+*.suo
+*.user
+*.useros
+*.userprefs
+
+# Archivos de caché generados por VS Code o Visual Studio
+.vs/
+
+# Paquetes NuGet y caché
+# Paquetes restaurados (aunque suelen ir en obj)
+packages/
+# Carpeta global de paquetes NuGet
+.nuget/
+
+## Logs y Caché
+log/
+[Ll]ogs/
+*.log
+*.sqlite
+*.db
+
+## Restauración de Dependencias
+# Ignorar carpetas generadas por dotnet restore
+.toolstmp/
+.cache/
+
+## Archivos de Configuración Sensibles
+# es buena práctica ignorar
+# archivos de configuración que puedan contener secretos.
+appsettings.Development.json
+appsettings.Production.json
+
+# Ignorar archivos temporales
+*~
+*.bak
+*.tmp
