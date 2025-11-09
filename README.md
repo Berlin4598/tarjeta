@@ -1,6 +1,8 @@
-# 💳 PrimeVideoPaymentSimulator: Simulador de Pago Seguro (ASP.NET Core)
+# 🛡️ PrimeVideoPaymentSimulator: Aplicación Web Segura con POO
 
-Este proyecto es una aplicación web desarrollada con **ASP.NET Core Razor Pages** que simula la interfaz de pago de Prime Video. El objetivo principal es demostrar la aplicación de la **Programación Orientada a Objetos (POO)**, la **Inyección de Dependencias**, y la implementación de técnicas de **seguridad criptográfica (BCrypt)** para proteger la información sensible de tarjetas.
+Este proyecto es una aplicación web desarrollada con **ASP.NET Core Razor Pages** que simula un formulario de pago al estilo de Prime Video. El objetivo es demostrar la aplicación rigurosa de principios de la **Programación Orientada a Objetos (POO)**, el uso de **Inyección de Dependencias** y la implementación de técnicas de **cifrado (BCrypt)** para la protección de datos sensibles.
+
+---
 
 ## ⚙️ Tecnologías Implementadas
 
@@ -29,5 +31,37 @@ La lógica de seguridad y validación se ejecuta completamente en el método `On
     * Los *hashes* resultantes se almacenan en las propiedades `HashedCardNumber` y `HashedCvv`.
 4.  **Limpieza de Datos Sensibles:** Los campos originales (`CardNumber` y `Cvv`) se **limpian (`= string.Empty;`)** antes de cualquier intento de guardar.
 5.  **Persistencia:** La instancia de `CardModel` (que solo contiene *hashes* y datos no sensibles) es añadida al contexto y guardada en la base de datos en memoria (`_context.ValidatedCards.Add(Card)`).
+
+---
+
+## 📐 Principios de la Programación Orientada a Objetos (POO)
+
+El diseño del proyecto está construido sobre los pilares de la POO:
+
+### 1. Encapsulamiento
+El encapsulamiento se utiliza para proteger la información interna y la lógica de las clases:
+
+* **Variables Privadas (`private readonly`):** En la clase `PaymentModel.cs`, las dependencias inyectadas (`_context` y `_validator`) se declaran como `private readonly`. Esto significa que **solo los métodos internos** de la clase `PaymentModel` pueden acceder a ellos. Esto protege el contexto de la base de datos y el servicio de validación de modificaciones externas e involuntarias.
+* **Propiedades Controladas:** Las propiedades de `CardModel.cs` utilizan *getters* y *setters* para controlar el acceso, manteniendo la integridad de los datos.
+
+### 2. Herencia
+La herencia se utiliza para obtener funcionalidades predefinidas del framework:
+
+* **`PaymentModel`:** Hereda de **`PageModel`** (librería `Microsoft.AspNetCore.Mvc.RazorPages`). Esta herencia otorga al modelo los métodos fundamentales para manejar las peticiones web (`OnGet` para GET y `OnPostAsync` para POST), permitiendo que el código se enfoque en la lógica de la aplicación y no en el protocolo HTTP.
+* **`AppDbContext`:** Hereda de **`DbContext`** (Entity Framework Core), obteniendo la capacidad de mapear objetos C# a la base de datos.
+
+### 3. Abstracción
+La abstracción se aplica para simplificar la complejidad del sistema, mostrando solo lo esencial:
+
+* **Servicio de Validación (`CardValidationService`):** Esta clase es el ejemplo clave de abstracción. Para la clase `PaymentModel`, la validación de la tarjeta es un proceso simple: llama a `_validator.Validate(Card)` y obtiene `true` o `false`.
+    * **Lo Abstraído (Oculto):** El `PaymentModel` no necesita saber *cómo* el servicio comprueba la fecha actual, ni *cómo* compara el año de vencimiento. La complejidad de la lógica de negocio (el "cómo") está oculta dentro del servicio.
+    * **Beneficio:** Permite modificar la lógica de validación del servicio sin tener que tocar el código del Page Model, mejorando la modularidad y el mantenimiento.
+
+---
+
+### 🛡️ Seguridad de Datos y Persistencia
+
+* **BCrypt para Hashing:** En `OnPostAsync()`, el número de tarjeta y el CVV se pasan a `BCrypt.HashPassword()`. Este algoritmo crea un *hash* unidireccional (imposible de revertir) que se guarda en las propiedades `HashedCardNumber` y `HashedCvv`.
+* **Limpieza de Datos Sensibles:** Antes de que Entity Framework Core guarde el modelo, los campos originales (`CardNumber` y `Cvv`) se establecen explícitamente en **`string.Empty`**. Esto asegura que los valores en texto plano nunca lleguen a la base de datos, incluso si se trata de una base de datos en memoria.
 
 ---
